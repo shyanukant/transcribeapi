@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from mangum import Mangum
 from .core.config import settings
 from users.api.controller import router as user_router
 from transcibe.controller import router as transcibe_router
@@ -9,6 +10,7 @@ from .core.config import settings
 # models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.PROJECT_NAME, description=settings.PROJECT_NAME, version="1.0.0")
+handler = Mangum(app)
 
 # Configure CORS
 origins = settings.BACKEND_CORS_ORIGINS
@@ -33,7 +35,9 @@ async def shutdown():
 app.include_router(user_router, prefix='/users')
 app.include_router(transcibe_router, prefix='/transcibe')
 
-
+@app.get('/')
+def root():
+    return {"message": f"Welcome to {settings.PROJECT_NAME}"}
 # if __name__ == "__main__":
 #     import uvicorn
 #     uvicorn.run(app, host="127.0.0.1", port=8000)
